@@ -29,4 +29,4 @@ def get_photo():
         ufr = requests.get(link)
         f.write(ufr.content)
         f.close()
-get_photo()
+# get_photo()
