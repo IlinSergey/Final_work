@@ -1,6 +1,7 @@
 import requests
 import config
 from pprint import pprint
+import json
 
 class VkAgent:
     def __init__(self, token:str, id:str):
@@ -16,6 +17,7 @@ class VkAgent:
         return response['response']['items'][i]['sizes'][-1]['url']
 
 
+
     def get_photo(self, count:int):
 
         url = 'https://api.vk.com/method/photos.get'
@@ -28,16 +30,23 @@ class VkAgent:
             'access_token': self.token,
             'v': '5.131'
         }
+        photo_list = []
         response = self.get_response(url, params)
-        #pprint(response)
         for i in range(count):
             file_name = response['response']['items'][i]['likes']['count']
             link = self.get_link(response, i)
+            photo_info = {}
+            photo_info['file_name'] = file_name
+            photo_info['size'] = response['response']['items'][i]['sizes'][-1]['type']
+            photo_list.append(photo_info)
             f = open(f'backup\{file_name}.jpg', 'wb')
             ufr = requests.get(link)
             f.write(ufr.content)
             f.close()
+        with open(r'backup\files_log.json', 'w') as f:
+            f.write(json.dumps(photo_list))
         print('Фото скачены')
+
 
 token = config.vk_token
 vk = VkAgent(token, '11606581')
