@@ -11,12 +11,13 @@ class VkAgent:
         return requests.get(url, params=params).json()
 
 
+
     def get_link(self,response, i=int):
-        for j in response['response']['items'][i]['sizes']:
-            if j['type'] == 'z':
-                return j['url']
+        return response['response']['items'][i]['sizes'][-1]['url']
+
 
     def get_photo(self, count:int):
+
         url = 'https://api.vk.com/method/photos.get'
         params = {
             'owner_id': self.id,
@@ -28,6 +29,7 @@ class VkAgent:
             'v': '5.131'
         }
         response = self.get_response(url, params)
+        #pprint(response)
         for i in range(count):
             file_name = response['response']['items'][i]['likes']['count']
             link = self.get_link(response, i)
@@ -38,8 +40,7 @@ class VkAgent:
         print('Фото скачены')
 
 token = config.vk_token
-vk = VkAgent(token, 11606581)
-vk.get_photo(2)
-
+vk = VkAgent(token, '11606581')
+vk.get_photo(5)
 
 
