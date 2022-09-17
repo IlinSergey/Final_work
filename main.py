@@ -1,8 +1,9 @@
 import requests
 import config
-from pprint import pprint
 import json
 import os
+from tqdm import tqdm
+
 
 class VkAgent:
     def __init__(self, token:str, id:str):
@@ -83,7 +84,7 @@ class YaUploader:
     def vk_photo_backup(self, cout_photo: int):
         vk.get_photo(cout_photo)
         file_list = os.listdir(r'backup')
-        for file in file_list:
+        for file in tqdm(file_list):
             path = f'backup\\{file}'
             uploader.upload(path)
         print('Файлы успешно загружены')
@@ -93,4 +94,4 @@ class YaUploader:
 uploader = YaUploader(config.yandex_token)
 vk = VkAgent(config.vk_token, '11606581')
 
-uploader.vk_photo_backup(5)
+uploader.vk_photo_backup(10)
