@@ -6,17 +6,17 @@ from tqdm import tqdm
 
 
 class VkAgent:
-    def __init__(self, token:str, id:str):
+    def __init__(self, token: str, id: str):
         self.token = token
         self.id = id
 
     def get_response(self, url, params):
         return requests.get(url, params=params).json()
 
-    def get_link(self,response, i=int):
+    def get_link(self, response, i=int):
         return response['response']['items'][i]['sizes'][-1]['url']
 
-    def get_photo(self, count:int):
+    def get_photo(self, count: int):
 
         url = 'https://api.vk.com/method/photos.get'
         params = {
@@ -71,13 +71,11 @@ class YaUploader:
         """Метод загружает файл на яндекс диск"""
         href = self.get_upload_link(path_to_file).get('href')
         if not href:
-            return print (f'Ошибка, ссылка не получена! {self.get_upload_link(path_to_file)["message"]}')
+            return print(f'Ошибка, ссылка не получена! {self.get_upload_link(path_to_file)["message"]}')
 
         with open(path_to_file, 'rb') as file:
             try:
-                response = requests.put(href, data=file)
-                # if response.status_code == 201:
-                #     print(f'Файл {file} загружен успешно')
+                requests.put(href, data=file)
             except KeyError:
                 print(f'Файл не загружен, ошибка: {self.get_upload_link(path_to_file)["message"]}')
 
