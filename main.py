@@ -2,6 +2,7 @@ import requests
 import config
 from pprint import pprint
 import json
+import os
 
 class VkAgent:
     def __init__(self, token:str, id:str):
@@ -11,12 +12,8 @@ class VkAgent:
     def get_response(self, url, params):
         return requests.get(url, params=params).json()
 
-
-
     def get_link(self,response, i=int):
         return response['response']['items'][i]['sizes'][-1]['url']
-
-
 
     def get_photo(self, count:int):
 
@@ -45,11 +42,55 @@ class VkAgent:
             f.close()
         with open(r'backup\files_log.json', 'w') as f:
             f.write(json.dumps(photo_list))
-        print('Фото скачены')
+        print('Фото скачаны')
+
+class YaUploader:
+    files_url = 'https://cloud-api.yandex.net/v1/disk/resources/files'
+    upload_url = 'https://cloud-api.yandex.net/v1/disk/resources/upload'
+    def __init__(self, token: str):
+        self.token = token
+    def get_header(self):
+        return{'Content-Type': 'application/json',
+               'Authorization': f'OAuth {self.token}'}
+
+    def convert_path_to_url(self, path_to_file):
+        simbols = {' ': '%20', '"': '%22', '&': '%26', '\\': '%5c', ':': '%5C', '=': '%3D'}
+        path_to_file_url = path_to_file
+        for k, v in simbols.items():
+            if k in path_to_file:
+                path_to_file_url = path_to_file_url.replace(k, v)
+        return path_to_file_url
+
+    def get_upload_link(self, path_to_file):
+        path_to_file_url = self.convert_path_to_url(path_to_file)
+        params = {'path': path_to_file_url, 'overwrite': 'True'}
+        response = requests.get(self.upload_url, params=params, headers=self.get_header()).json()
+        return response
+    def upload(self, path_to_file: str):
+        """Метод загружает файл на яндекс диск"""
+        href = self.get_upload_link(path_to_file).get('href')
+        if not href:
+            return print (f'Ошибка, ссылка не получена! {self.get_upload_link(path_to_file)["message"]}')
+
+        with open(path_to_file, 'rb') as file:
+            try:
+                response = requests.put(href, data=file)
+                # if response.status_code == 201:
+                #     print(f'Файл {file} загружен успешно')
+            except KeyError:
+                print(f'Файл не загружен, ошибка: {self.get_upload_link(path_to_file)["message"]}')
+
+    def vk_photo_backup(self, cout_photo: int):
+        vk.get_photo(cout_photo)
+        file_list = os.listdir(r'backup')
+        for file in file_list:
+            path = f'backup\\{file}'
+            uploader.upload(path)
+        print('Файлы успешно загружены')
 
 
-token = config.vk_token
-vk = VkAgent(token, '11606581')
-vk.get_photo(5)
 
+uploader = YaUploader(config.yandex_token)
+vk = VkAgent(config.vk_token, '11606581')
 
+uploader.vk_photo_backup(5)
