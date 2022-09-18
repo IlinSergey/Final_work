@@ -88,8 +88,47 @@ class YaUploader:
         print('Файлы успешно загружены')
 
 
+URL = 'https://cloud-api.yandex.net/v1/disk/resources'
+TOKEN = config.yandex_token
+headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': f'OAuth {TOKEN}'}
 
-uploader = YaUploader(config.yandex_token)
+
+def upload_file(cout_photo: int, replace=True):
+    """Загрузка файла.
+    savefile: Путь к файлу на Диске
+    loadfile: Путь к загружаемому файлу
+    replace: true or false Замена файла на Диске"""
+    vk.get_photo(cout_photo)
+    file_list = os.listdir(r'backup')
+    for file in tqdm(file_list):
+        res = requests.get(f'{URL}/upload?path=backup/{file}&overwrite={replace}', headers=headers).json()
+        path = f'backup\\{file}'
+        with open(path, 'rb') as f:
+            try:
+                requests.put(res['href'], files={'file':f})
+            except KeyError:
+                print(res)
+
+
 vk = VkAgent(config.vk_token, '11606581')
+upload_file(5)
 
-uploader.vk_photo_backup(5)
+# def vk_photo_backup(self, cout_photo: int):
+#     vk.get_photo(cout_photo)
+#     file_list = os.listdir(r'backup')
+#     for file in tqdm(file_list):
+#         path = f'backup\\{file}'
+#         uploader.upload(path)
+#     print('Файлы успешно загружены')
+
+
+
+
+
+
+
+
+# uploader = YaUploader(config.yandex_token)
+
+#
+# uploader.vk_photo_backup(5)
