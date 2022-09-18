@@ -92,4 +92,4 @@ class YaUploader:
 uploader = YaUploader(config.yandex_token)
 vk = VkAgent(config.vk_token, '11606581')
 
-uploader.vk_photo_backup(10)
+uploader.vk_photo_backup(5)
