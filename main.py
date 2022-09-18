@@ -94,10 +94,6 @@ headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Au
 
 
 def upload_file(cout_photo: int, replace=True):
-    """Загрузка файла.
-    savefile: Путь к файлу на Диске
-    loadfile: Путь к загружаемому файлу
-    replace: true or false Замена файла на Диске"""
     vk.get_photo(cout_photo)
     file_list = os.listdir(r'backup')
     for file in tqdm(file_list):
